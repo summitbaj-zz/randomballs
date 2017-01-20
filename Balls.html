@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<style type="text/css">
+		* {
+			padding: 0px;
+			margin: 0px;
+		}
+		div.box {
+			width: 10px;
+			height: 10px;
+			position: absolute;
+			border-radius:100%;
+		}
+		#container {
+			width: 800px;
+			height: 500px;
+			border: 1px solid black;
+			position: relative;
+		}
+	</style>
+	<div id="container">
+
+	</div>
+	<script type="text/javascript">
+		(function() {
+			function getRandom(min, max) {
+				return Math.floor(Math.random()*(max-min+1)+min);
+			}
+			var boxNumber = 80;
+			var circlesize=12;
+			var containerWidth =  750;
+			var containerHeight = 450; 
+
+			function getRandomColor() {
+				var letters = '0123456789ABCDEF';
+				var color = '#';
+				for (var i = 0; i < 6; i++ ) {
+					color += letters[Math.floor(Math.random() * 16)];
+				}
+				return color;
+			}
+
+			function Box() {
+				this.x = 0;
+				this.y = 0;
+				this.color = getRandomColor();
+				this.flag = getRandom(0,1);
+				this.element;
+
+				this.init = function() {
+					this.element = document.createElement('div');
+					this.element.setAttribute('class', 'box');
+					this.element.style.top = this.y + 'px';
+					this.element.style.left = this.x + 'px';
+					this.element.style.backgroundColor = this.color; 
+
+					document.getElementById('container').appendChild(this.element);
+				}
+
+				this.redraw = function() {
+					this.element.style.top = this.y + 'px';
+					this.element.style.left = this.x + 'px';
+				}
+			}
+
+			function BoxAnimation() {
+				var that = this;
+
+				this.boxes = [];
+
+				this.init = function() {
+					for (var i=0; i<boxNumber; i++) {
+						var box = new Box();
+						box.x = getRandom(0, 600);
+						box.y = getRandom(0, 300);
+						box.init();
+
+						this.boxes.push(box);
+					}
+
+					setInterval(this.moveBoxes, 1);
+				}
+
+				this.moveBoxes = function() 
+				{	
+					for (var i=0; i<boxNumber; i++) {
+						var box = that.boxes[i];
+						//console.log("box 1 : " + box.x + "box 2 : " + box.y);
+
+
+
+						for(var j=0; (j<boxNumber && j!=i); j++)
+						{
+							var a = box.x - that.boxes[j].x;
+							var b = box.y - that.boxes[j].y;
+							var radius = Math.sqrt( a*a + b*b );
+							//console.log(radius);
+							
+							//boucing with nearest upto 2px //
+							if(radius <= (circlesize)){
+
+								if(box.x > that.boxes[j].x && box.y >  that.boxes[j].x)
+								{
+									box.flag=2;
+									that.boxes[j].flag=3;
+								}
+
+								if(box.x < that.boxes[j].x && box.y <  that.boxes[j].x)
+								{
+									box.flag=3;
+									that.boxes[j].flag=2;
+								}
+								if(box.x > that.boxes[j].x && box.y <  that.boxes[j].x)
+								{
+									box.flag=1;
+									that.boxes[j].flag=0;
+								}
+								if(box.x < that.boxes[j].x && box.y >  that.boxes[j].x){
+									box.flag=0;
+									that.boxes[j].flag=1;
+									
+								}
+				
+						}
+					}
+		
+		
+					if( box.x > 750 && box.y > 450)
+					{
+						box.flag = 1;
+					}
+
+					if(box.x==0 && box.y==0)
+					{
+						box.flag = 0;
+								} 
+					if(box.x>750 && box.y < 450)
+					{
+						if(box.flag == 2){
+							box.flag = 1;
+						}
+						
+						else{
+							box.flag = 3;
+							
+						}
+					}
+					if(box.x<750 && box.y > 450)
+					{
+						if(box.flag==3)
+						{
+							box.flag = 1;
+						}
+						else{
+							box.flag = 2;
+						}
+					}
+					if(box.x<0 && box.y>0)
+					{
+						if(box.flag==3)
+						{
+							box.flag=0;
+						}
+						else{
+
+							box.flag=2;
+						}
+					}
+					if(box.x>0 && box.y<0)
+					{
+						if(box.flag==2){
+						box.flag=0;
+						}
+						else{
+						box.flag=3;
+
+						}
+
+					}
+		
+
+		
+		
+		if(box.flag==0){
+			box.x++;
+			box.y++;
+		}
+		else if(box.flag==1){
+			box.x--;
+			box.y--;
+		}
+		else if(box.flag==2){
+			box.x++;
+			box.y--;
+		}
+		else if(box.flag==3){
+			box.x--;
+			box.y++;
+		}
+		box.redraw();
+	}
+	
+}
+}
+
+new BoxAnimation().init();
+})();
+</script>
+</body>
+</html>
